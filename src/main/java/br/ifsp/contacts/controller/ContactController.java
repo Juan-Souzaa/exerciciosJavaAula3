@@ -37,6 +37,10 @@ public class ContactController {
     }
 
     // exercicio 1 Buscar por nome
+    @GetMapping("/search")
+    public List<Contact> searchContactsByName(@RequestParam String name) {
+        return contactRepository.findByNomeContainingIgnoreCase(name);
+    }
 
  
 
