@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PatchMapping;
+import br.ifsp.contacts.model.Address;
+import br.ifsp.contacts.repository.AddressRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -26,6 +28,9 @@ public class ContactController {
     
     @Autowired
     private ContactRepository contactRepository;
+
+    @Autowired
+    private AddressRepository addressRepository;
 
     @GetMapping    
     public List<Contact> getAllContacts() {
@@ -43,6 +48,16 @@ public class ContactController {
     @GetMapping("/search")
     public List<Contact> searchContactsByName(@RequestParam String name) {
         return contactRepository.findByNomeContainingIgnoreCase(name);
+    }
+    
+    @GetMapping("/{id}/addresses")
+    public ResponseEntity<List<Address>> getContactAddresses(@PathVariable Long id) {
+        if (!contactRepository.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        
+        List<Address> addresses = addressRepository.findByContactId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(addresses);
     }
 
  
