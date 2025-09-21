@@ -1,0 +1,128 @@
+EXERCÍCIO 3 - REST E SOAP
+Aula 03 - Introdução às APIs REST e ao Spring Boot
+
+
+1. QUAL A PRINCIPAL DIFERENÇA ENTRE REST E SOAP?
+
+
+REST (Representational State Transfer):
+- Arquitetura: Baseada em recursos (resources) identificados por URLs
+- Protocolo: Usa HTTP de forma nativa
+- Formato: JSON, XML, HTML (flexível)
+- Comunicação: Stateless (sem estado entre requisições)
+- Padrão: Usa métodos HTTP (GET, POST, PUT, DELETE, PATCH)
+
+SOAP (Simple Object Access Protocol):
+- Arquitetura: Baseada em RPC (Remote Procedure Call)
+- Protocolo: HTTP, SMTP, TCP (múltiplos)
+- Formato: Apenas XML (estruturado e verboso)
+- Comunicação: Pode ser stateful
+- Padrão: Usa envelopes XML com definições WSDL
+
+DIFERENÇA PRINCIPAL: 
+REST é mais simples e flexível, usando HTTP de forma natural, 
+enquanto SOAP é mais estruturado e pesado, baseado em XML.
+
+
+2. EM QUAIS CENÁRIOS SOAP AINDA É UTILIZADO?
+
+
+Cenários onde SOAP ainda é preferível:
+
+- Sistemas bancários e financeiros: Devido à segurança robusta (WS-Security)
+- Integração empresarial legada: Sistemas antigos que já usam SOAP
+- Aplicações críticas: Onde a confiabilidade e transações ACID são essenciais
+- Ambientes corporativos: Onde há necessidade de contratos rígidos (WSDL)
+- Sistemas governamentais: Muitos ainda mantêm padrões SOAP
+- Integração com sistemas SAP, Oracle: Muitos ERPs corporativos usam SOAP
+
+3. VANTAGENS E DESVANTAGENS DE USAR REST AO INVÉS DE SOAP
+
+
+VANTAGENS DO REST:
+ Simplicidade: Mais fácil de implementar e entender
+ Performance: Mais leve e rápido (JSON vs XML)
+ Flexibilidade: Múltiplos formatos (JSON, XML, HTML)
+ Escalabilidade: Stateless facilita distribuição
+ Cache: Aproveita cache HTTP nativo
+ Adoção: Padrão atual da web moderna
+
+DESVANTAGENS DO REST:
+ Segurança: Depende de implementação (HTTPS, JWT, OAuth)
+ Padronização: Menos rígido que SOAP
+ Transações: Não suporta transações distribuídas nativamente
+ Contratos: Menos formal que WSDL
+
+
+4. O QUE É WS-SECURITY E COMO ELE SE COMPARA À SEGURANÇA EM APIs REST?
+
+
+WS-SECURITY:
+- Padrão integrado ao SOAP para segurança
+- Criptografia e assinatura digital nativas
+- Autenticação e autorização robustas
+- Padrão formal e bem definido
+- Suporte a certificados digitais
+
+SEGURANÇA EM REST:
+- Depende de implementação: HTTPS, JWT, OAuth 2.0
+- Mais flexível mas requer mais cuidado
+- Padrões modernos: OAuth 2.0, OpenID Connect
+- Mais simples de implementar para casos básicos
+
+COMPARAÇÃO: 
+WS-Security oferece segurança "pronta para uso" mas é mais pesado. 
+REST oferece flexibilidade mas requer implementação cuidadosa.
+
+
+5. EXPLIQUE O MODELO DE MATURIDADE DE RICHARDSON
+
+
+MODELO DE MATURIDADE DE RICHARDSON (RMM):
+Avalia quão "RESTful" uma API realmente é, com 4 níveis:
+
+NÍVEL 0 - "O PONTO DE ENTRADA ÚNICO":
+- Usa HTTP apenas como transporte
+- Exemplo: APIs SOAP antigas
+
+NÍVEL 1 - "RECURSOS":
+- Organiza dados em recursos com URLs únicas
+- Ainda não usa métodos HTTP corretamente
+- Exemplo: XML-RPC do Movable Type (2001)
+
+NÍVEL 2 - "USO CORRETO DE VERBOS HTTP":
+- Usa GET, POST, PUT, DELETE, PATCH corretamente
+- APIs verdadeiramente RESTful
+- Exemplo: API do Twitter (2006)
+
+NÍVEL 3 - "HATEOAS":
+- Inclui links para ações relacionadas nas respostas
+- Descoberta dinâmica de funcionalidades
+- Exemplo: API da Amazon (2011)
+
+APLICAÇÃO: 
+A maioria das APIs modernas opera no nível 2, que já é considerado 
+"RESTful" adequado.
+
+
+6. O QUE É GRAPHQL? PESQUISA E RELACIONE COM OS CONCEITOS VISTOS EM AULA
+
+
+GRAPHQL:
+- Linguagem de consulta criada pelo Facebook em 2012
+- Single endpoint para todas as operações
+- Cliente define exatamente quais dados quer receber
+- Tipagem forte e schema bem definido
+
+
+RELAÇÃO COM CONCEITOS DA AULA:
+- REST segue o Modelo de Richardson Nível 2
+- GraphQL pode ser considerado uma evolução além do REST
+- Ambos usam HTTP como protocolo base
+- REST é mais padronizado e previsível
+- GraphQL oferece mais flexibilidade na consulta de dados
+
+QUANDO USAR CADA UM:
+- REST: APIs simples, cache importante, equipes pequenas
+- GraphQL: Aplicações complexas, múltiplos clientes, performance crítica
+
