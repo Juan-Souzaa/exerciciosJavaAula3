@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/contacts")
@@ -61,6 +64,32 @@ public class ContactController {
         existingContact.setTelefone(updatedContact.getTelefone());
 
         return contactRepository.save(existingContact);
+    }
+
+     // exercicio 2 Atualização parcial (PATCH)
+    @PatchMapping("/{id}")
+    public ResponseEntity<Contact> partialUpdateContact(@PathVariable Long id, @RequestBody Contact updatedContact) {
+        Contact existingContact = contactRepository.findById(id).orElse(null);
+        
+        // Se não encontrou, retorna 404
+        if (existingContact == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        
+        // Atualiza apenas os campos que foram enviados (não nulos)
+        if (updatedContact.getNome() != null) {
+            existingContact.setNome(updatedContact.getNome());
+        }
+        if (updatedContact.getEmail() != null) {
+            existingContact.setEmail(updatedContact.getEmail());
+        }
+        if (updatedContact.getTelefone() != null) {
+            existingContact.setTelefone(updatedContact.getTelefone());
+        }
+        
+        // Salva e retorna o contato atualizado
+        Contact savedContact = contactRepository.save(existingContact);
+        return ResponseEntity.ok(savedContact);
     }
 
     @DeleteMapping("/{id}")
