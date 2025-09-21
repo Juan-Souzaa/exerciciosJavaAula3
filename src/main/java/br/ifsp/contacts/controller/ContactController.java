@@ -21,6 +21,7 @@ import br.ifsp.contacts.model.Address;
 import br.ifsp.contacts.repository.AddressRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/contacts")
@@ -65,12 +66,12 @@ public class ContactController {
     
  
     @PostMapping
-    public Contact createContact(@RequestBody Contact contact) {
+    public Contact createContact(@Valid @RequestBody Contact contact) {
         return contactRepository.save(contact);
     }
     
     @PutMapping("/{id}")
-    public Contact updateContact(@PathVariable Long id, @RequestBody Contact updatedContact) {
+    public Contact updateContact(@PathVariable Long id, @Valid @RequestBody Contact updatedContact) {
         Contact existingContact = contactRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Contato não encontrado: " + id));
         
