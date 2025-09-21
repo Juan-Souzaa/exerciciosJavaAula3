@@ -1,8 +1,11 @@
 package br.ifsp.contacts.controller;
 
+import br.ifsp.contacts.dto.ContactDTO;
 import br.ifsp.contacts.model.Contact;
+import br.ifsp.contacts.model.Address;
 import br.ifsp.contacts.repository.ContactRepository;
 import br.ifsp.contacts.exception.ResourceNotFoundException;
+import br.ifsp.contacts.mapper.ContactMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,38 +23,56 @@ public class ContactController {
     @Autowired
     private ContactRepository contactRepository;
 
+    @Autowired
+    private ContactMapper contactMapper;
+
     @GetMapping
-    public List<Contact> getAllContacts() {
-        return contactRepository.findAll();
+    public List<ContactDTO> getAllContacts() {
+        List<Contact> contacts = contactRepository.findAll();
+        return contactMapper.toDTOList(contacts);
     }
 
     @GetMapping("{id}")
-    public Contact getContactById(@PathVariable Long id) {
-        return contactRepository.findById(id)
+    public ContactDTO getContactById(@PathVariable Long id) {
+        Contact contact = contactRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Contato não encontrado: " + id));
+        return contactMapper.toDTO(contact);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Contact createContact(@Valid @RequestBody Contact contact) {
-        return contactRepository.save(contact);
+    public ContactDTO createContact(@Valid @RequestBody ContactDTO contactDTO) {
+        Contact contact = contactMapper.toEntity(contactDTO);
+        Contact savedContact = contactRepository.save(contact);
+        return contactMapper.toDTO(savedContact);
     }
 
     @PutMapping("/{id}")
-    public Contact updateContact(@PathVariable Long id, @Valid @RequestBody Contact updatedContact) {
+    public ContactDTO updateContact(@PathVariable Long id, @Valid @RequestBody ContactDTO updatedContactDTO) {
         Contact existingContact = contactRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Contato não encontrado: " + id));
 
-        existingContact.setNome(updatedContact.getNome());
-        existingContact.setEmail(updatedContact.getEmail());
-        existingContact.setTelefone(updatedContact.getTelefone());
-        existingContact.setAddresses(updatedContact.getAddresses());
+        existingContact.setNome(updatedContactDTO.getNome());
+        existingContact.setEmail(updatedContactDTO.getEmail());
+        existingContact.setTelefone(updatedContactDTO.getTelefone());
+        
+        // Converter DTOs de endereços para entidades
+        if (updatedContactDTO.getAddresses() != null) {
+            existingContact.setAddresses(updatedContactDTO.getAddresses().stream()
+                    .map(addressDTO -> {
+                        Address address = contactMapper.addressToEntity(addressDTO);
+                        address.setContact(existingContact);
+                        return address;
+                    })
+                    .collect(java.util.stream.Collectors.toList()));
+        }
 
-        return contactRepository.save(existingContact);
+        Contact savedContact = contactRepository.save(existingContact);
+        return contactMapper.toDTO(savedContact);
     }
 
     @PatchMapping("/{id}")
-    public Contact updateContactPartial(@PathVariable Long id, @RequestBody Map<String, String> updates) {
+    public ContactDTO updateContactPartial(@PathVariable Long id, @RequestBody Map<String, String> updates) {
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Contato não encontrado: " + id));
 
@@ -69,7 +90,8 @@ public class ContactController {
             }
         });
 
-        return contactRepository.save(contact);
+        Contact savedContact = contactRepository.save(contact);
+        return contactMapper.toDTO(savedContact);
     }
 
     @DeleteMapping("/{id}")
@@ -78,7 +100,8 @@ public class ContactController {
     }
 
     @GetMapping("/search")
-    public List<Contact> searchContactsByName(@RequestParam String name) {
-        return contactRepository.findByNomeContainingIgnoreCase(name);
+    public List<ContactDTO> searchContactsByName(@RequestParam String name) {
+        List<Contact> contacts = contactRepository.findByNomeContainingIgnoreCase(name);
+        return contactMapper.toDTOList(contacts);
     }
 }
