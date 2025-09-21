@@ -32,19 +32,15 @@ public class AddressController {
     }
     
     @PostMapping
-    public ResponseEntity<Address> createAddress(@RequestBody Address address) {
-        if (address.getContact() == null || address.getContact().getId() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        
-        Contact contact = contactRepository.findById(address.getContact().getId()).orElse(null);
+    public ResponseEntity<Address> createAddress(@RequestBody Address address, @RequestParam Long contactId) {
+        Contact contact = contactRepository.findById(contactId).orElse(null);
         if (contact == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         
         address.setContact(contact);
         Address savedAddress = addressRepository.save(address);
-        return ResponseEntity.status(HttpStatus.OK).body(savedAddress);
+        return ResponseEntity.ok(savedAddress);
     }
     
     @PutMapping("/{id}")

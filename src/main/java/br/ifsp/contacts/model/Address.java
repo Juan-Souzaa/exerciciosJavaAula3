@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Address {
@@ -21,6 +22,7 @@ public class Address {
     
     @ManyToOne
     @JoinColumn(name = "contact_id")
+    @JsonIgnore
     private Contact contact;
     
     public Address() {}
