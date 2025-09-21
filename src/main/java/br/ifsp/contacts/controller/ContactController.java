@@ -7,6 +7,9 @@ import br.ifsp.contacts.repository.ContactRepository;
 import br.ifsp.contacts.exception.ResourceNotFoundException;
 import br.ifsp.contacts.mapper.ContactMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -27,9 +30,9 @@ public class ContactController {
     private ContactMapper contactMapper;
 
     @GetMapping
-    public List<ContactDTO> getAllContacts() {
-        List<Contact> contacts = contactRepository.findAll();
-        return contactMapper.toDTOList(contacts);
+    public Page<ContactDTO> getAllContacts(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+        Page<Contact> contacts = contactRepository.findAll(pageable);
+        return contacts.map(contactMapper::toDTO);
     }
 
     @GetMapping("{id}")
@@ -100,8 +103,9 @@ public class ContactController {
     }
 
     @GetMapping("/search")
-    public List<ContactDTO> searchContactsByName(@RequestParam String name) {
-        List<Contact> contacts = contactRepository.findByNomeContainingIgnoreCase(name);
-        return contactMapper.toDTOList(contacts);
+    public Page<ContactDTO> searchContactsByName(@RequestParam String name, 
+                                                @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+        Page<Contact> contacts = contactRepository.findByNomeContainingIgnoreCase(name, pageable);
+        return contacts.map(contactMapper::toDTO);
     }
 }
