@@ -6,33 +6,38 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.util.List;
 import java.util.ArrayList;
 
 @Entity
 public class Contact {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank(message = "Nome é obrigatório")
+
+    @NotBlank(message = "O nome não pode estar vazio")
     private String nome;
-    
-    @NotBlank(message = "Email é obrigatório")
-    @Email(message = "Email deve ter formato válido")
+
+    @NotBlank(message = "O email não pode estar vazio")
+    @Email(message = "Formato de email inválido")
     private String email;
-    
-    @NotBlank(message = "Telefone é obrigatório")
-    @Size(min = 8, max = 15, message = "Telefone deve ter entre 8 e 15 caracteres")
+
+    @NotBlank(message = "O telefone não pode estar vazio")
+    @Size(min = 8, max = 15, message = "O telefone deve ter entre 8 e 15 caracteres")
+    @Pattern(regexp = "\\d+", message = "O telefone deve conter apenas números")
     private String telefone;
-    
-    @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @NotEmpty(message = "O contato deve ter pelo menos um endereço")
     private List<Address> addresses = new ArrayList<>();
 
     public Long getId() {
@@ -68,17 +73,16 @@ public class Contact {
     }
     
     public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
-    }
-    
-    public void addAddress(Address address) {
-        addresses.add(address);
-        address.setContact(this);
-    }
-    
-    public void removeAddress(Address address) {
-        addresses.remove(address);
-        address.setContact(null);
+        if (addresses != null) {
+            addresses.forEach(address -> address.setContact(this)); 
+            
+            if (this.addresses == null) { 
+                this.addresses = new ArrayList<>();
+            }
+            
+            this.addresses.clear(); 
+            this.addresses.addAll(addresses);         
+        }
     }
 
     public Contact() {
