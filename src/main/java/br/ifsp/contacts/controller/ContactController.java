@@ -15,12 +15,15 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/contacts")
 @Validated
+@Tag(name = "Contatos", description = "Operações relacionadas ao gerenciamento de contatos")
 public class ContactController {
 
     @Autowired
@@ -29,12 +32,14 @@ public class ContactController {
     @Autowired
     private ContactMapper contactMapper;
 
+    @Operation(summary = "Listar todos os contatos", description = "Recupera uma lista paginada de todos os contatos")
     @GetMapping
     public Page<ContactDTO> getAllContacts(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         Page<Contact> contacts = contactRepository.findAll(pageable);
         return contacts.map(contactMapper::toDTO);
     }
 
+    @Operation(summary = "Buscar contato por ID", description = "Recupera um contato específico pelo seu identificador único")
     @GetMapping("{id}")
     public ContactDTO getContactById(@PathVariable Long id) {
         Contact contact = contactRepository.findById(id)
@@ -42,6 +47,7 @@ public class ContactController {
         return contactMapper.toDTO(contact);
     }
 
+    @Operation(summary = "Criar novo contato", description = "Cria um novo contato no sistema")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ContactDTO createContact(@Valid @RequestBody ContactDTO contactDTO) {
@@ -50,6 +56,7 @@ public class ContactController {
         return contactMapper.toDTO(savedContact);
     }
 
+    @Operation(summary = "Atualizar contato", description = "Atualiza todos os dados de um contato existente")
     @PutMapping("/{id}")
     public ContactDTO updateContact(@PathVariable Long id, @Valid @RequestBody ContactDTO updatedContactDTO) {
         Contact existingContact = contactRepository.findById(id)
@@ -74,6 +81,7 @@ public class ContactController {
         return contactMapper.toDTO(savedContact);
     }
 
+    @Operation(summary = "Atualizar contato parcialmente", description = "Atualiza apenas campos específicos de um contato existente")
     @PatchMapping("/{id}")
     public ContactDTO updateContactPartial(@PathVariable Long id, @RequestBody Map<String, String> updates) {
         Contact contact = contactRepository.findById(id)
@@ -97,11 +105,13 @@ public class ContactController {
         return contactMapper.toDTO(savedContact);
     }
 
+    @Operation(summary = "Excluir contato", description = "Remove um contato do sistema")
     @DeleteMapping("/{id}")
     public void deleteContact(@PathVariable Long id) {
         contactRepository.deleteById(id);
     }
 
+    @Operation(summary = "Buscar contatos por nome", description = "Busca contatos que contenham o nome especificado")
     @GetMapping("/search")
     public Page<ContactDTO> searchContactsByName(@RequestParam String name, 
                                                 @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
